@@ -234,7 +234,7 @@ a{ color: inherit; }
 .meta{ color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
 .metaBig{ font-size: 0.9rem; color: var(--text); }
 .metaBig strong{ font-weight: 600; }
-.metaSmall{ font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.metaSmall{ font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
 .metaSmall strong{ font-weight: 600; font-size: inherit; }
 .pill{
   font-size: 0.8rem;

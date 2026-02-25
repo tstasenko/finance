@@ -26,9 +26,28 @@ function copyCategoriesWithNewIds(categories: Category[]): Category[] {
 }
 
 export function ensureMonth(state: AppState, monthKey: MonthKey): AppState {
-  if (state.months[monthKey]) return state;
+  const current = state.months[monthKey];
   const prevKey = shiftMonth(monthKey, -1);
   const prev = state.months[prevKey];
+
+  if (current && current.categories.length > 0) {
+    return state;
+  }
+  if (current && current.categories.length === 0 && prev && prev.categories.length > 0) {
+    const newMonth: MonthlyState = {
+      ...current,
+      budgetPlan: prev.budgetPlan,
+      categories: copyCategoriesWithNewIds(prev.categories),
+      incomes: [],
+      expenses: [],
+    };
+    return {
+      ...state,
+      months: { ...state.months, [monthKey]: newMonth },
+    };
+  }
+  if (current) return state;
+
   const newMonth: MonthlyState = prev
     ? {
         monthKey,
@@ -40,10 +59,7 @@ export function ensureMonth(state: AppState, monthKey: MonthKey): AppState {
     : emptyMonth(monthKey);
   return {
     ...state,
-    months: {
-      ...state.months,
-      [monthKey]: newMonth,
-    },
+    months: { ...state.months, [monthKey]: newMonth },
   };
 }
 

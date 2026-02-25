@@ -8,6 +8,7 @@ import { supabase } from "../supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import { AuthGate } from "./Auth";
 import { Backup } from "./Backup";
+import { HistoryList } from "./HistoryList";
 
 function SectionTitle({ title, hint }: { title: string; hint?: string }) {
   return (
@@ -41,7 +42,11 @@ export function App() {
   const [monthKey, setMonthKey] = useState<MonthKey>(currentMonthKey);
 
   const month = state.months[monthKey];
+  const prevMonthKey = shiftMonth(monthKey, -1);
+  const prevMonth = state.months[prevMonthKey];
   if (!month) {
+    dispatch({ type: "month/ensure", monthKey });
+  } else if (month.categories.length === 0 && prevMonth?.categories.length) {
     dispatch({ type: "month/ensure", monthKey });
   }
 
@@ -58,6 +63,9 @@ export function App() {
 
   const [catName, setCatName] = useState("");
   const [catPlanned, setCatPlanned] = useState("");
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [editingCatName, setEditingCatName] = useState("");
+  const [editingCatPlanned, setEditingCatPlanned] = useState("");
 
   const [expCategoryId, setExpCategoryId] = useState(m.categories[0]?.id ?? "");
   const [expAmount, setExpAmount] = useState("");
@@ -448,6 +456,50 @@ export function App() {
               const spent = categorySpent(state, monthKey, c.id);
               const remaining = c.planned - spent;
               const isOver = remaining < 0;
+              const isEditing = editingCategoryId === c.id;
+              if (isEditing) {
+                return (
+                  <div className="listItem" key={c.id}>
+                    <div className="row" style={{ flex: 1, flexWrap: "wrap", gap: 10 }}>
+                      <div className="field" style={{ minWidth: 140 }}>
+                        <label>Название</label>
+                        <input
+                          className="input"
+                          value={editingCatName}
+                          onChange={(e) => setEditingCatName(e.target.value)}
+                          placeholder="категория"
+                        />
+                      </div>
+                      <div className="field" style={{ minWidth: 120 }}>
+                        <label>План (прогноз)</label>
+                        <input
+                          className="input"
+                          value={editingCatPlanned}
+                          inputMode="decimal"
+                          onChange={(e) => setEditingCatPlanned(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="row-btns">
+                      <button
+                        className="btn btnPrimary"
+                        onClick={() => {
+                          const name = editingCatName.trim();
+                          const planned = parseMoney(editingCatPlanned) ?? 0;
+                          if (!name) return;
+                          dispatch({ type: "category/update", monthKey, id: c.id, name, planned });
+                          setEditingCategoryId(null);
+                        }}
+                      >
+                        Сохранить
+                      </button>
+                      <button className="btn" onClick={() => setEditingCategoryId(null)}>
+                        Отмена
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <div className="listItem" key={c.id}>
                   <div>
@@ -455,13 +507,25 @@ export function App() {
                     <span className={`pill ${isOver ? "pillDanger" : ""}`}>
                       Остаток: {formatMoney(remaining)}
                     </span>
-                  <div className="meta metaSmall">
-                    План: <strong>{formatMoney(c.planned)}</strong> • Потрачено: <strong>{formatMoney(spent)}</strong>
+                    <div className="meta metaSmall">
+                      План: <strong>{formatMoney(c.planned)}</strong> • Потрачено: <strong>{formatMoney(spent)}</strong>
+                    </div>
                   </div>
+                  <div className="row-btns">
+                    <button
+                      className="btn"
+                      onClick={() => {
+                        setEditingCategoryId(c.id);
+                        setEditingCatName(c.name);
+                        setEditingCatPlanned(String(c.planned));
+                      }}
+                    >
+                      Изменить
+                    </button>
+                    <button className="btn btnDanger" onClick={() => dispatch({ type: "category/delete", monthKey, id: c.id })}>
+                      Удалить
+                    </button>
                   </div>
-                  <button className="btn btnDanger" onClick={() => dispatch({ type: "category/delete", monthKey, id: c.id })}>
-                    Удалить
-                  </button>
                 </div>
               );
             })}
@@ -473,77 +537,7 @@ export function App() {
           <SectionTitle title="История операций (месяц)" hint="Доходы / расходы / накопления" />
 
           <div className="list">
-            {(() => {
-              const items: { date: string; createdAt: number; key: string; el: React.ReactNode }[] = [];
-              m.incomes.forEach((x) =>
-                items.push({
-                  date: x.date,
-                  createdAt: x.createdAt,
-                  key: `i:${x.id}`,
-                  el: (
-                    <div className="listItem" key={`i:${x.id}`}>
-                      <div>
-                        <strong className="pos">+ {formatMoney(x.amount)}</strong>
-                        <div className="meta">{x.date}{x.comment ? ` • ${x.comment}` : ""}</div>
-                      </div>
-                      <span className="pill">Доход</span>
-                    </div>
-                  ),
-                })
-              );
-              m.expenses.forEach((x) => {
-                const cat = m.categories.find((c) => c.id === x.categoryId);
-                items.push({
-                  date: x.date,
-                  createdAt: x.createdAt,
-                  key: `e:${x.id}`,
-                  el: (
-                    <div className="listItem" key={`e:${x.id}`}>
-                      <div>
-                        <strong className="neg">- {formatMoney(x.amount)}</strong>
-                        <div className="meta">
-                          {x.date} • {cat?.name ?? "Категория удалена"}
-                          {x.comment ? ` • ${x.comment}` : ""}
-                        </div>
-                      </div>
-                      <span className="pill">Расход</span>
-                    </div>
-                  ),
-                });
-              });
-              state.savings.transactions
-                .filter((t) => t.monthKey === monthKey)
-                .forEach((t) => {
-                  const cat = state.savings.categories.find((c) => c.id === t.savingsCategoryId);
-                  const isDep = t.type === "deposit";
-                  items.push({
-                    date: t.date,
-                    createdAt: t.createdAt,
-                    key: `s:${t.id}`,
-                    el: (
-                      <div className="listItem" key={`s:${t.id}`}>
-                        <div>
-                          <strong className={isDep ? "neg" : "pos"}>
-                            {isDep ? "- " : "+ "}
-                            {formatMoney(t.amount)}
-                          </strong>
-                          <div className="meta">
-                            {t.date} • Накопления: {cat?.name ?? "Категория удалена"}
-                            {t.comment ? ` • ${t.comment}` : ""}
-                          </div>
-                        </div>
-                        <span className="pill">{isDep ? "В накопления" : "Из накоплений"}</span>
-                      </div>
-                    ),
-                  });
-                });
-              items.sort((a, b) => {
-                if (a.date !== b.date) return b.date.localeCompare(a.date);
-                return b.createdAt - a.createdAt;
-              });
-              if (!items.length) return <div className="hint">Пока нет операций за этот месяц.</div>;
-              return items.map((item) => <div key={item.key}>{item.el}</div>);
-            })()}
+            <HistoryList monthKey={monthKey} m={m} state={state} dispatch={dispatch} formatMoney={formatMoney} />
           </div>
         </div>
       </div>

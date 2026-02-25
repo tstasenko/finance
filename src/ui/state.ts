@@ -7,6 +7,7 @@ import type {
   MonthKey,
   SavingsCategory,
   SavingsTransaction,
+  SavingsTxnType,
 } from "../core/types";
 import { ensureMonth, ids, isStateEmpty, loadState, saveState } from "../core/storage";
 import { loadUserState, saveUserState } from "../supabase/userState";
@@ -18,14 +19,18 @@ type Action =
   | { type: "month/setBudgetPlan"; monthKey: MonthKey; budgetPlan: number }
   | { type: "income/add"; monthKey: MonthKey; amount: number; comment?: string; date?: string }
   | { type: "income/delete"; monthKey: MonthKey; id: string }
+  | { type: "income/update"; monthKey: MonthKey; id: string; amount: number; comment?: string; date: string }
   | { type: "category/add"; monthKey: MonthKey; name: string; planned: number }
   | { type: "category/update"; monthKey: MonthKey; id: string; name: string; planned: number }
   | { type: "category/delete"; monthKey: MonthKey; id: string }
   | { type: "expense/add"; monthKey: MonthKey; categoryId: string; amount: number; comment?: string; date?: string }
   | { type: "expense/delete"; monthKey: MonthKey; id: string }
+  | { type: "expense/update"; monthKey: MonthKey; id: string; categoryId: string; amount: number; comment?: string; date: string }
   | { type: "savingsCategory/add"; name: string }
   | { type: "savingsCategory/delete"; id: string }
   | { type: "savings/txn"; txn: Omit<SavingsTransaction, "id" | "createdAt"> }
+  | { type: "savings/txnDelete"; id: string }
+  | { type: "savings/txnUpdate"; id: string; operationType: SavingsTxnType; amount: number; comment?: string; date: string; savingsCategoryId: string; monthKey: MonthKey }
   | { type: "state/replace"; next: AppState };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -80,6 +85,29 @@ function reducer(state: AppState, action: Action): AppState {
           [action.monthKey]: {
             ...m,
             incomes: m.incomes.filter((x) => x.id !== action.id),
+          },
+        },
+      };
+    }
+    case "income/update": {
+      const m = state.months[action.monthKey];
+      if (!m) return state;
+      return {
+        ...state,
+        months: {
+          ...state.months,
+          [action.monthKey]: {
+            ...m,
+            incomes: m.incomes.map((x) =>
+              x.id === action.id
+                ? {
+                    ...x,
+                    amount: roundMoney(action.amount),
+                    comment: action.comment?.trim() || undefined,
+                    date: action.date as any,
+                  }
+                : x,
+            ),
           },
         },
       };
@@ -172,6 +200,30 @@ function reducer(state: AppState, action: Action): AppState {
         },
       };
     }
+    case "expense/update": {
+      const m = state.months[action.monthKey];
+      if (!m) return state;
+      return {
+        ...state,
+        months: {
+          ...state.months,
+          [action.monthKey]: {
+            ...m,
+            expenses: m.expenses.map((x) =>
+              x.id === action.id
+                ? {
+                    ...x,
+                    categoryId: action.categoryId,
+                    amount: roundMoney(action.amount),
+                    comment: action.comment?.trim() || undefined,
+                    date: action.date as any,
+                  }
+                : x,
+            ),
+          },
+        },
+      };
+    }
     case "savingsCategory/add": {
       const now = Date.now();
       const sc: SavingsCategory = { id: ids.newId(), name: action.name.trim(), balance: 0, createdAt: now };
@@ -206,6 +258,53 @@ function reducer(state: AppState, action: Action): AppState {
           categories,
           transactions: [txn, ...state.savings.transactions],
         },
+      };
+    }
+    case "savings/txnDelete": {
+      const txn = state.savings.transactions.find((t) => t.id === action.id);
+      if (!txn) return state;
+      const categories = state.savings.categories.map((c) => {
+        if (c.id !== txn.savingsCategoryId) return c;
+        const delta = txn.type === "deposit" ? -txn.amount : txn.amount;
+        return { ...c, balance: roundMoney(c.balance + delta) };
+      });
+      return {
+        ...state,
+        savings: {
+          categories,
+          transactions: state.savings.transactions.filter((t) => t.id !== action.id),
+        },
+      };
+    }
+    case "savings/txnUpdate": {
+      const prev = state.savings.transactions.find((t) => t.id === action.id);
+      if (!prev) return state;
+      const categories1 = state.savings.categories.map((c) => {
+        if (c.id !== prev.savingsCategoryId) return c;
+        const undo = prev.type === "deposit" ? -prev.amount : prev.amount;
+        return { ...c, balance: roundMoney(c.balance + undo) };
+      });
+      const categories2 = categories1.map((c) => {
+        if (c.id !== action.savingsCategoryId) return c;
+        const delta = action.operationType === "deposit" ? action.amount : -action.amount;
+        return { ...c, balance: roundMoney(c.balance + delta) };
+      });
+      const transactions = state.savings.transactions.map((t) =>
+        t.id === action.id
+          ? {
+              ...t,
+              type: action.operationType,
+              amount: roundMoney(action.amount),
+              comment: action.comment?.trim() || undefined,
+              date: action.date as any,
+              savingsCategoryId: action.savingsCategoryId,
+              monthKey: action.monthKey,
+            }
+          : t,
+      );
+      return {
+        ...state,
+        savings: { categories: categories2, transactions },
       };
     }
     default:
