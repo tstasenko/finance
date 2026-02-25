@@ -7,6 +7,7 @@ import { useAppStore } from "./state";
 import { supabase } from "../supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import { AuthGate } from "./Auth";
+import { Backup } from "./Backup";
 
 function SectionTitle({ title, hint }: { title: string; hint?: string }) {
   return (
@@ -128,6 +129,7 @@ export function App() {
           >
             Текущий
           </button>
+          <Backup state={state} onReplace={(next) => dispatch({ type: "state/replace", next })} />
           <button
             className="btn"
             onClick={() => {
@@ -247,120 +249,6 @@ export function App() {
         </div>
 
         <div className="card">
-          <SectionTitle title="Категории и расходы" hint="План по категории + списание расходов" />
-
-          <div className="row">
-            <div className="field">
-              <label>Новая категория</label>
-              <input className="input" value={catName} placeholder="например: продукты" onChange={(e) => setCatName(e.target.value)} />
-            </div>
-            <div className="field">
-              <label>План (прогноз расходов)</label>
-              <input
-                className="input"
-                value={catPlanned}
-                inputMode="decimal"
-                placeholder="например 15000"
-                onChange={(e) => setCatPlanned(e.target.value)}
-              />
-            </div>
-            <div className="row-btns">
-              <button
-                className="btn btnPrimary"
-                onClick={() => {
-                  const name = catName.trim();
-                  const planned = parseMoney(catPlanned) ?? 0;
-                  if (!name) return;
-                  dispatch({ type: "category/add", monthKey, name, planned });
-                  setCatName("");
-                  setCatPlanned("");
-                  const maybe = state.months[monthKey]?.categories[0]?.id;
-                  if (maybe) setExpCategoryId(maybe);
-                }}
-              >
-                Добавить
-              </button>
-            </div>
-          </div>
-
-          <div style={{ height: 10 }} />
-
-          <div className="row">
-            <div className="field">
-              <label>Категория</label>
-              <select
-                className="select"
-                value={expCategoryId}
-                onChange={(e) => setExpCategoryId(e.target.value)}
-                disabled={!m.categories.length}
-              >
-                {m.categories.length ? null : <option value="">Сначала добавьте категорию</option>}
-                {m.categories.map((c) => (
-                  <option value={c.id} key={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label>Сумма расхода</label>
-              <input className="input" value={expAmount} inputMode="decimal" placeholder="например 799" onChange={(e) => setExpAmount(e.target.value)} />
-            </div>
-            <div className="field">
-              <label>Дата</label>
-              <input className="input" type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} />
-            </div>
-            <div className="field">
-              <label>Комментарий</label>
-              <input className="input" value={expComment} placeholder="необязательно" onChange={(e) => setExpComment(e.target.value)} />
-            </div>
-            <div className="row-btns">
-              <button
-                className="btn btnPrimary"
-                disabled={!m.categories.length}
-                onClick={() => {
-                  const n = parseMoney(expAmount);
-                  if (!expCategoryId) return;
-                  if (n === null || n <= 0) return;
-                  dispatch({ type: "expense/add", monthKey, categoryId: expCategoryId, amount: n, comment: expComment, date: expDate });
-                  setExpAmount("");
-                  setExpComment("");
-                }}
-              >
-                Списать
-              </button>
-            </div>
-          </div>
-
-          <div className="list">
-            {m.categories.map((c) => {
-              const spent = categorySpent(state, monthKey, c.id);
-              const remaining = c.planned - spent;
-              const isOver = remaining < 0;
-              return (
-                <div className="listItem" key={c.id}>
-                  <div>
-                    <strong>{c.name}</strong>{" "}
-                    <span className={`pill ${isOver ? "pillDanger" : ""}`}>
-                      Остаток: {formatMoney(remaining)}
-                    </span>
-                  <div className="meta metaBig">
-                    План: <strong>{formatMoney(c.planned)}</strong> • Потрачено: <strong>{formatMoney(spent)}</strong>
-                    </div>
-                  </div>
-                  <button className="btn btnDanger" onClick={() => dispatch({ type: "category/delete", monthKey, id: c.id })}>
-                    Удалить
-                  </button>
-                </div>
-              );
-            })}
-            {!m.categories.length ? <div className="hint">Пока нет категорий.</div> : null}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid2">
-        <div className="card">
           <SectionTitle title="Долгосрочные накопления" hint="Категории не зависят от месяца" />
 
           <div className="row">
@@ -458,6 +346,120 @@ export function App() {
               </div>
             ))}
             {!state.savings.categories.length ? <div className="hint">Пока нет категорий накоплений.</div> : null}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid2">
+        <div className="card">
+          <SectionTitle title="Категории и расходы" hint="План по категории + списание расходов" />
+
+          <div className="row">
+            <div className="field">
+              <label>Новая категория</label>
+              <input className="input" value={catName} placeholder="например: продукты" onChange={(e) => setCatName(e.target.value)} />
+            </div>
+            <div className="field">
+              <label>План (прогноз расходов)</label>
+              <input
+                className="input"
+                value={catPlanned}
+                inputMode="decimal"
+                placeholder="например 15000"
+                onChange={(e) => setCatPlanned(e.target.value)}
+              />
+            </div>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                onClick={() => {
+                  const name = catName.trim();
+                  const planned = parseMoney(catPlanned) ?? 0;
+                  if (!name) return;
+                  dispatch({ type: "category/add", monthKey, name, planned });
+                  setCatName("");
+                  setCatPlanned("");
+                  const maybe = state.months[monthKey]?.categories[0]?.id;
+                  if (maybe) setExpCategoryId(maybe);
+                }}
+              >
+                Добавить
+              </button>
+            </div>
+          </div>
+
+          <div style={{ height: 10 }} />
+
+          <div className="row">
+            <div className="field">
+              <label>Категория</label>
+              <select
+                className="select"
+                value={expCategoryId}
+                onChange={(e) => setExpCategoryId(e.target.value)}
+                disabled={!m.categories.length}
+              >
+                {m.categories.length ? null : <option value="">Сначала добавьте категорию</option>}
+                {m.categories.map((c) => (
+                  <option value={c.id} key={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label>Сумма расхода</label>
+              <input className="input" value={expAmount} inputMode="decimal" placeholder="например 799" onChange={(e) => setExpAmount(e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Дата</label>
+              <input className="input" type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Комментарий</label>
+              <input className="input" value={expComment} placeholder="необязательно" onChange={(e) => setExpComment(e.target.value)} />
+            </div>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                disabled={!m.categories.length}
+                onClick={() => {
+                  const n = parseMoney(expAmount);
+                  if (!expCategoryId) return;
+                  if (n === null || n <= 0) return;
+                  dispatch({ type: "expense/add", monthKey, categoryId: expCategoryId, amount: n, comment: expComment, date: expDate });
+                  setExpAmount("");
+                  setExpComment("");
+                }}
+              >
+                Списать
+              </button>
+            </div>
+          </div>
+
+          <div className="list">
+            {m.categories.map((c) => {
+              const spent = categorySpent(state, monthKey, c.id);
+              const remaining = c.planned - spent;
+              const isOver = remaining < 0;
+              return (
+                <div className="listItem" key={c.id}>
+                  <div>
+                    <strong>{c.name}</strong>{" "}
+                    <span className={`pill ${isOver ? "pillDanger" : ""}`}>
+                      Остаток: {formatMoney(remaining)}
+                    </span>
+                  <div className="meta metaSmall">
+                    План: <strong>{formatMoney(c.planned)}</strong> • Потрачено: <strong>{formatMoney(spent)}</strong>
+                  </div>
+                  </div>
+                  <button className="btn btnDanger" onClick={() => dispatch({ type: "category/delete", monthKey, id: c.id })}>
+                    Удалить
+                  </button>
+                </div>
+              );
+            })}
+            {!m.categories.length ? <div className="hint">Пока нет категорий.</div> : null}
           </div>
         </div>
 

@@ -33,24 +33,17 @@ a{ color: inherit; }
 }
 
 .topbar{
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 18px 22px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(11,18,32,0.98), rgba(11,18,32,0.95));
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
   border-radius: 20px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
-}
-
-.main-content {
-  padding-top: 8px;
 }
 
 .brand{
@@ -65,6 +58,12 @@ a{ color: inherit; }
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.backup-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn{
@@ -218,6 +217,8 @@ a{ color: inherit; }
 .meta{ color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
 .metaBig{ font-size: 0.9rem; color: var(--text); }
 .metaBig strong{ font-weight: 600; }
+.metaSmall{ font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.metaSmall strong{ font-weight: 600; }
 .pill{
   font-size: 0.8rem;
   padding: 6px 12px;

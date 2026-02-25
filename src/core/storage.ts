@@ -68,5 +68,21 @@ export function saveState(state: AppState) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+/** True if state has no meaningful data (like createInitialState with no user input). */
+export function isStateEmpty(state: AppState): boolean {
+  const monthKeys = Object.keys(state.months);
+  if (monthKeys.length === 0) return true;
+  const hasDataInMonths = monthKeys.some((k) => {
+    const m = state.months[k as MonthKey];
+    return (
+      m &&
+      (m.budgetPlan > 0 || m.categories.length > 0 || m.incomes.length > 0 || m.expenses.length > 0)
+    );
+  });
+  if (hasDataInMonths) return false;
+  if (state.savings.categories.length > 0 || state.savings.transactions.length > 0) return false;
+  return true;
+}
+
 export const ids = { newId };
 

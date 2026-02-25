@@ -8,7 +8,7 @@ import type {
   SavingsCategory,
   SavingsTransaction,
 } from "../core/types";
-import { ensureMonth, ids, loadState, saveState } from "../core/storage";
+import { ensureMonth, ids, isStateEmpty, loadState, saveState } from "../core/storage";
 import { loadUserState, saveUserState } from "../supabase/userState";
 import { monthKeyFromDate, toISODate } from "../core/date";
 import { roundMoney } from "../core/money";
@@ -220,13 +220,18 @@ export function useAppStore(userId?: string | null) {
     saveState(state);
   }, [state]);
 
-  // Load from Supabase when user logs in
+  // Load from Supabase when user logs in (don't overwrite local data with empty cloud)
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
     (async () => {
       const remote = await loadUserState(userId);
       if (cancelled) return;
+      const current = loadState();
+      if (isStateEmpty(remote) && !isStateEmpty(current)) {
+        void saveUserState(userId, current);
+        return;
+      }
       dispatch({ type: "state/replace", next: remote });
     })();
     return () => {
