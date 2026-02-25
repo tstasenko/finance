@@ -207,18 +207,20 @@ export function App() {
                 onChange={(e) => setIncomeComment(e.target.value)}
               />
             </div>
-            <button
-              className="btn btnPrimary"
-              onClick={() => {
-                const n = parseMoney(incomeAmount);
-                if (n === null || n <= 0) return;
-                dispatch({ type: "income/add", monthKey, amount: n, comment: incomeComment });
-                setIncomeAmount("");
-                setIncomeComment("");
-              }}
-            >
-              Добавить
-            </button>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                onClick={() => {
+                  const n = parseMoney(incomeAmount);
+                  if (n === null || n <= 0) return;
+                  dispatch({ type: "income/add", monthKey, amount: n, comment: incomeComment });
+                  setIncomeAmount("");
+                  setIncomeComment("");
+                }}
+              >
+                Добавить
+              </button>
+            </div>
           </div>
 
           {m.incomes.length ? (
@@ -261,22 +263,23 @@ export function App() {
                 onChange={(e) => setCatPlanned(e.target.value)}
               />
             </div>
-            <button
-              className="btn btnPrimary"
-              onClick={() => {
-                const name = catName.trim();
-                const planned = parseMoney(catPlanned) ?? 0;
-                if (!name) return;
-                dispatch({ type: "category/add", monthKey, name, planned });
-                setCatName("");
-                setCatPlanned("");
-                // best effort: update select
-                const maybe = state.months[monthKey]?.categories[0]?.id;
-                if (maybe) setExpCategoryId(maybe);
-              }}
-            >
-              Добавить
-            </button>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                onClick={() => {
+                  const name = catName.trim();
+                  const planned = parseMoney(catPlanned) ?? 0;
+                  if (!name) return;
+                  dispatch({ type: "category/add", monthKey, name, planned });
+                  setCatName("");
+                  setCatPlanned("");
+                  const maybe = state.months[monthKey]?.categories[0]?.id;
+                  if (maybe) setExpCategoryId(maybe);
+                }}
+              >
+                Добавить
+              </button>
+            </div>
           </div>
 
           <div style={{ height: 10 }} />
@@ -310,20 +313,22 @@ export function App() {
               <label>Комментарий</label>
               <input className="input" value={expComment} placeholder="необязательно" onChange={(e) => setExpComment(e.target.value)} />
             </div>
-            <button
-              className="btn btnPrimary"
-              disabled={!m.categories.length}
-              onClick={() => {
-                const n = parseMoney(expAmount);
-                if (!expCategoryId) return;
-                if (n === null || n <= 0) return;
-                dispatch({ type: "expense/add", monthKey, categoryId: expCategoryId, amount: n, comment: expComment, date: expDate });
-                setExpAmount("");
-                setExpComment("");
-              }}
-            >
-              Списать
-            </button>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                disabled={!m.categories.length}
+                onClick={() => {
+                  const n = parseMoney(expAmount);
+                  if (!expCategoryId) return;
+                  if (n === null || n <= 0) return;
+                  dispatch({ type: "expense/add", monthKey, categoryId: expCategoryId, amount: n, comment: expComment, date: expDate });
+                  setExpAmount("");
+                  setExpComment("");
+                }}
+              >
+                Списать
+              </button>
+            </div>
           </div>
 
           <div className="list">
@@ -362,17 +367,19 @@ export function App() {
               <label>Новая категория накоплений</label>
               <input className="input" value={savingsCatName} placeholder="например: отпуск" onChange={(e) => setSavingsCatName(e.target.value)} />
             </div>
-            <button
-              className="btn btnPrimary"
-              onClick={() => {
-                const name = savingsCatName.trim();
-                if (!name) return;
-                dispatch({ type: "savingsCategory/add", name });
-                setSavingsCatName("");
-              }}
-            >
-              Добавить
-            </button>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                onClick={() => {
+                  const name = savingsCatName.trim();
+                  if (!name) return;
+                  dispatch({ type: "savingsCategory/add", name });
+                  setSavingsCatName("");
+                }}
+              >
+                Добавить
+              </button>
+            </div>
           </div>
 
           <div style={{ height: 10 }} />
@@ -409,30 +416,32 @@ export function App() {
               <label>Комментарий</label>
               <input className="input" value={savingsTxnComment} placeholder="например: на ремонт" onChange={(e) => setSavingsTxnComment(e.target.value)} />
             </div>
-            <button
-              className="btn btnPrimary"
-              disabled={!state.savings.categories.length}
-              onClick={() => {
-                const n = parseMoney(savingsTxnAmount);
-                if (!savingsTxnCategoryId) return;
-                if (n === null || n <= 0) return;
-                dispatch({
-                  type: "savings/txn",
-                  txn: {
-                    type: savingsTxnType,
-                    date: toISODate(new Date()),
-                    monthKey,
-                    savingsCategoryId: savingsTxnCategoryId,
-                    amount: n,
-                    comment: savingsTxnComment.trim() || undefined,
-                  },
-                });
-                setSavingsTxnAmount("");
-                setSavingsTxnComment("");
-              }}
-            >
-              Провести
-            </button>
+            <div className="row-btns">
+              <button
+                className="btn btnPrimary"
+                disabled={!state.savings.categories.length}
+                onClick={() => {
+                  const n = parseMoney(savingsTxnAmount);
+                  if (!savingsTxnCategoryId) return;
+                  if (n === null || n <= 0) return;
+                  dispatch({
+                    type: "savings/txn",
+                    txn: {
+                      type: savingsTxnType,
+                      date: toISODate(new Date()),
+                      monthKey,
+                      savingsCategoryId: savingsTxnCategoryId,
+                      amount: n,
+                      comment: savingsTxnComment.trim() || undefined,
+                    },
+                  });
+                  setSavingsTxnAmount("");
+                  setSavingsTxnComment("");
+                }}
+              >
+                Провести
+              </button>
+            </div>
           </div>
 
           <div className="list">

@@ -46,48 +46,62 @@ export function AuthGate({ session, onSessionChange }: Props) {
 
   return (
     <div className="container">
-      <div className="card" style={{ maxWidth: 420, margin: "80px auto" }}>
+      <div className="card auth-card">
         <div className="cardHeader">
           <h2>Вход в трекер</h2>
         </div>
         <p className="hint">
           Авторизация нужна, чтобы ваши данные хранились в Supabase и были доступны с любого устройства.
         </p>
-        <div className="field">
-          <label>Email</label>
-          <input
-            className="input"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-          />
-        </div>
-        <div className="field">
-          <label>Пароль</label>
-          <input
-            className="input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Минимум 6 символов"
-          />
-        </div>
-        {error ? <div className="hint" style={{ color: "#fca5a5" }}>{error}</div> : null}
-        <div style={{ height: 10 }} />
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btnPrimary" disabled={loading} onClick={handleSubmit}>
-            {mode === "signin" ? "Войти" : "Создать аккаунт"}
-          </button>
-          <button
-            className="btn"
-            type="button"
-            disabled={loading}
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          >
-            {mode === "signin" ? "Новый пользователь" : "У меня уже есть аккаунт"}
-          </button>
-        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
+          <div className="field">
+            <label>Email</label>
+            <input
+              className="input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+            />
+          </div>
+          <div className="field">
+            <label>Пароль</label>
+            <input
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Минимум 6 символов"
+              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+            />
+          </div>
+          {error ? <div className="hint" style={{ color: "#fca5a5" }}>{error}</div> : null}
+          <div className="auth-actions">
+            <button type="submit" className="btn btnPrimary" disabled={loading}>
+              {mode === "signin" ? "Войти" : "Создать аккаунт"}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              disabled={loading}
+              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            >
+              {mode === "signin" ? "Новый пользователь" : "У меня уже есть аккаунт"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
