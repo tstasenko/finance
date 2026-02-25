@@ -94,6 +94,11 @@ a{ color: inherit; }
   white-space: nowrap;
 }
 .btn:hover{ background: rgba(255,255,255,0.10); }
+.btnSm{
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
 .btnPrimary{
   background: rgba(124,58,237,0.22);
   border-color: rgba(124,58,237,0.45);
@@ -169,10 +174,11 @@ a{ color: inherit; }
 .row .row-btns{
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   flex-shrink: 0;
-  min-width: 140px;
+  min-width: 120px;
   justify-content: flex-end;
+  align-self: center;
 }
 .field{
   display: flex;
@@ -200,17 +206,20 @@ a{ color: inherit; }
 
 .kpi{
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
 }
 .kpiItem{
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 16px;
+  border-radius: 12px;
+  padding: 8px 12px;
   background: rgba(255,255,255,0.05);
 }
-.kpiItem .label{ font-size: 0.8rem; color: var(--muted); }
-.kpiItem .value{ font-size: 1.15rem; margin-top: 6px; }
+.kpiItem .label{ font-size: 0.7rem; color: var(--muted); }
+.kpiItem .value{ font-size: 0.95rem; margin-top: 2px; }
+.kpiSm .kpiItem{ padding: 6px 10px; }
+.kpiSm .kpiItem .label{ font-size: 0.65rem; }
+.kpiSm .kpiItem .value{ font-size: 0.85rem; }
 .neg{ color: var(--danger); }
 .pos{ color: var(--ok); }
 

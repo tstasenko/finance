@@ -227,7 +227,7 @@ export function App() {
             </div>
             <div className="row-btns">
               <button
-                className="btn btnPrimary"
+                className="btn btnSm btnPrimary"
                 onClick={() => {
                   const n = parseMoney(incomeAmount);
                   if (n === null || n <= 0) return;
@@ -252,7 +252,7 @@ export function App() {
                       {x.comment ? ` • ${x.comment}` : ""}
                     </div>
                   </div>
-                  <button className="btn btnDanger" onClick={() => dispatch({ type: "income/delete", monthKey, id: x.id })}>
+                  <button className="btn btnSm btnDanger" onClick={() => dispatch({ type: "income/delete", monthKey, id: x.id })}>
                     Удалить
                   </button>
                 </div>
@@ -266,6 +266,13 @@ export function App() {
         <div className="card">
           <SectionTitle title="Долгосрочные накопления" hint="Категории не зависят от месяца" />
 
+          <div className="kpi kpiSm" style={{ marginTop: 8, marginBottom: 12 }}>
+            <div className="kpiItem">
+              <div className="label">Накопления всего</div>
+              <div className="value pos">{formatMoney(savingsTotal)}</div>
+            </div>
+          </div>
+
           <div className="row">
             <div className="field">
               <label>Новая категория накоплений</label>
@@ -273,7 +280,7 @@ export function App() {
             </div>
             <div className="row-btns">
               <button
-                className="btn btnPrimary"
+                className="btn btnSm btnPrimary"
                 onClick={() => {
                   const name = savingsCatName.trim();
                   if (!name) return;
@@ -322,7 +329,7 @@ export function App() {
             </div>
             <div className="row-btns">
               <button
-                className="btn btnPrimary"
+                className="btn btnSm btnPrimary"
                 disabled={!state.savings.categories.length}
                 onClick={() => {
                   const n = parseMoney(savingsTxnAmount);
@@ -354,7 +361,7 @@ export function App() {
                 <div>
                   <strong>{c.name}</strong> <span className="pill">Баланс: {formatMoney(c.balance)}</span>
                 </div>
-                <button className="btn btnDanger" onClick={() => dispatch({ type: "savingsCategory/delete", id: c.id })}>
+                <button className="btn btnSm btnDanger" onClick={() => dispatch({ type: "savingsCategory/delete", id: c.id })}>
                   Удалить
                 </button>
               </div>
@@ -385,7 +392,7 @@ export function App() {
             </div>
             <div className="row-btns">
               <button
-                className="btn btnPrimary"
+                className="btn btnSm btnPrimary"
                 onClick={() => {
                   const name = catName.trim();
                   const planned = parseMoney(catPlanned) ?? 0;
@@ -435,7 +442,7 @@ export function App() {
             </div>
             <div className="row-btns">
               <button
-                className="btn btnPrimary"
+                className="btn btnSm btnPrimary"
                 disabled={!m.categories.length}
                 onClick={() => {
                   const n = parseMoney(expAmount);
@@ -481,21 +488,21 @@ export function App() {
                       </div>
                     </div>
                     <div className="row-btns">
-                      <button
-                        className="btn btnPrimary"
-                        onClick={() => {
-                          const name = editingCatName.trim();
-                          const planned = parseMoney(editingCatPlanned) ?? 0;
-                          if (!name) return;
-                          dispatch({ type: "category/update", monthKey, id: c.id, name, planned });
-                          setEditingCategoryId(null);
-                        }}
-                      >
-                        Сохранить
-                      </button>
-                      <button className="btn" onClick={() => setEditingCategoryId(null)}>
-                        Отмена
-                      </button>
+                    <button
+                      className="btn btnSm btnPrimary"
+                      onClick={() => {
+                        const name = editingCatName.trim();
+                        const planned = parseMoney(editingCatPlanned) ?? 0;
+                        if (!name) return;
+                        dispatch({ type: "category/update", monthKey, id: c.id, name, planned });
+                        setEditingCategoryId(null);
+                      }}
+                    >
+                      Сохранить
+                    </button>
+                    <button className="btn btnSm" onClick={() => setEditingCategoryId(null)}>
+                      Отмена
+                    </button>
                     </div>
                   </div>
                 );
@@ -513,7 +520,7 @@ export function App() {
                   </div>
                   <div className="row-btns">
                     <button
-                      className="btn"
+                      className="btn btnSm"
                       onClick={() => {
                         setEditingCategoryId(c.id);
                         setEditingCatName(c.name);
@@ -522,7 +529,7 @@ export function App() {
                     >
                       Изменить
                     </button>
-                    <button className="btn btnDanger" onClick={() => dispatch({ type: "category/delete", monthKey, id: c.id })}>
+                    <button className="btn btnSm btnDanger" onClick={() => dispatch({ type: "category/delete", monthKey, id: c.id })}>
                       Удалить
                     </button>
                   </div>

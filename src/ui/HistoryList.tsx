@@ -161,8 +161,8 @@ export function HistoryList({ monthKey, m, state, dispatch, formatMoney }: Props
                 )}
               </div>
               <div className="row-btns">
-                <button type="button" className="btn btnPrimary" onClick={onSave}>Сохранить</button>
-                <button type="button" className="btn" onClick={() => setEdit(null)}>Отмена</button>
+                <button type="button" className="btn btnSm btnPrimary" onClick={onSave}>Сохранить</button>
+                <button type="button" className="btn btnSm" onClick={() => setEdit(null)}>Отмена</button>
               </div>
             </div>
           );
@@ -177,8 +177,8 @@ export function HistoryList({ monthKey, m, state, dispatch, formatMoney }: Props
                 <div className="meta">{x.date}{x.comment ? ` • ${x.comment}` : ""}</div>
               </div>
               <div className="row-btns">
-                <button type="button" className="btn" onClick={() => setEdit({ kind: "income", id: x.id, amount: String(x.amount), comment: x.comment ?? "", date: x.date })}>Изменить</button>
-                <button type="button" className="btn btnDanger" onClick={() => dispatch({ type: "income/delete", monthKey, id: x.id })}>Удалить</button>
+                <button type="button" className="btn btnSm" onClick={() => setEdit({ kind: "income", id: x.id, amount: String(x.amount), comment: x.comment ?? "", date: x.date })}>Изменить</button>
+                <button type="button" className="btn btnSm btnDanger" onClick={() => dispatch({ type: "income/delete", monthKey, id: x.id })}>Удалить</button>
               </div>
             </div>
           );
@@ -193,8 +193,8 @@ export function HistoryList({ monthKey, m, state, dispatch, formatMoney }: Props
                 <div className="meta">{x.date} • {cat?.name ?? "Категория удалена"}{x.comment ? ` • ${x.comment}` : ""}</div>
               </div>
               <div className="row-btns">
-                <button type="button" className="btn" onClick={() => setEdit({ kind: "expense", id: x.id, categoryId: x.categoryId, amount: String(x.amount), comment: x.comment ?? "", date: x.date })}>Изменить</button>
-                <button type="button" className="btn btnDanger" onClick={() => dispatch({ type: "expense/delete", monthKey, id: x.id })}>Удалить</button>
+                <button type="button" className="btn btnSm" onClick={() => setEdit({ kind: "expense", id: x.id, categoryId: x.categoryId, amount: String(x.amount), comment: x.comment ?? "", date: x.date })}>Изменить</button>
+                <button type="button" className="btn btnSm btnDanger" onClick={() => dispatch({ type: "expense/delete", monthKey, id: x.id })}>Удалить</button>
               </div>
             </div>
           );
@@ -209,8 +209,8 @@ export function HistoryList({ monthKey, m, state, dispatch, formatMoney }: Props
               <div className="meta">{t.date} • Накопления: {cat?.name ?? "Категория удалена"}{t.comment ? ` • ${t.comment}` : ""}</div>
             </div>
             <div className="row-btns">
-              <button type="button" className="btn" onClick={() => setEdit({ kind: "savings", id: t.id, type: t.type, savingsCategoryId: t.savingsCategoryId, amount: String(t.amount), comment: t.comment ?? "", date: t.date })}>Изменить</button>
-              <button type="button" className="btn btnDanger" onClick={() => dispatch({ type: "savings/txnDelete", id: t.id })}>Удалить</button>
+              <button type="button" className="btn btnSm" onClick={() => setEdit({ kind: "savings", id: t.id, type: t.type, savingsCategoryId: t.savingsCategoryId, amount: String(t.amount), comment: t.comment ?? "", date: t.date })}>Изменить</button>
+              <button type="button" className="btn btnSm btnDanger" onClick={() => dispatch({ type: "savings/txnDelete", id: t.id })}>Удалить</button>
             </div>
           </div>
         );
