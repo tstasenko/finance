@@ -33,13 +33,17 @@ a{ color: inherit; }
 }
 
 .topbar{
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 18px 22px;
+  margin-bottom: 20px;
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  background: linear-gradient(180deg, rgba(11,18,32,0.98), rgba(11,18,32,0.95));
   border-radius: 20px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
