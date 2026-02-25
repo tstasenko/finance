@@ -16,6 +16,7 @@ html{ font-size: 18px; }
 html, body{ height: 100%; }
 body{
   margin: 0;
+  padding-top: 24px;
   color: var(--text);
   background:
     radial-gradient(1200px 600px at 10% 0%, rgba(124,58,237,0.30), transparent 55%),
@@ -29,7 +30,8 @@ a{ color: inherit; }
 
 .container{
   width: min(1400px, calc(100% - 48px));
-  margin: 32px auto 64px;
+  margin: 0 auto 64px;
+  padding-top: 12px;
 }
 
 .topbar{
@@ -217,8 +219,8 @@ a{ color: inherit; }
 .meta{ color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
 .metaBig{ font-size: 0.9rem; color: var(--text); }
 .metaBig strong{ font-weight: 600; }
-.metaSmall{ font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-.metaSmall strong{ font-weight: 600; }
+.metaSmall{ font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.metaSmall strong{ font-weight: 600; font-size: inherit; }
 .pill{
   font-size: 0.8rem;
   padding: 6px 12px;
