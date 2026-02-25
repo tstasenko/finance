@@ -124,6 +124,10 @@ export function App() {
             <div style={{ fontSize: 13, color: "var(--muted)" }}>Месяц</div>
             <div style={{ fontSize: 16 }}>{monthTitle}</div>
           </div>
+          <div className="kpiItem kpiItemTop">
+            <div className="label">Всего денег</div>
+            <div className={`value ${balanceWithSavings < 0 ? "neg" : ""}`}>{formatMoney(balanceWithSavings)}</div>
+          </div>
           <button
             className="btn"
             onClick={() => {
@@ -159,7 +163,7 @@ export function App() {
       <main className="main-content">
       <div className="grid2">
         <div className="card">
-          <SectionTitle title="Бюджет месяца" hint="Прогноз + добавления денег в течение месяца" />
+          <SectionTitle title="Бюджет месяца" />
 
           <div className="row">
             <div className="field" style={{ maxWidth: 260 }}>
@@ -195,10 +199,6 @@ export function App() {
               <div className="kpiItem">
                 <div className="label">Остаток без накоплений</div>
                 <div className={`value ${balance < 0 ? "neg" : ""}`}>{formatMoney(balance)}</div>
-              </div>
-              <div className="kpiItem">
-                <div className="label">Всего с накоплениями</div>
-                <div className={`value ${balanceWithSavings < 0 ? "neg" : ""}`}>{formatMoney(balanceWithSavings)}</div>
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@ export function App() {
         </div>
 
         <div className="card">
-          <SectionTitle title="Долгосрочные накопления" hint="Категории не зависят от месяца" />
+          <SectionTitle title="Долгосрочные накопления" />
 
           <div className="kpi kpiSm" style={{ marginTop: 8, marginBottom: 12 }}>
             <div className="kpiItem">
