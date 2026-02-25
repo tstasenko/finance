@@ -139,6 +139,7 @@ export function App() {
         </div>
       </div>
 
+      <main className="main-content">
       <div className="grid2">
         <div className="card">
           <SectionTitle title="Бюджет месяца" hint="Прогноз + добавления денег в течение месяца" />
@@ -518,6 +519,7 @@ export function App() {
           </div>
         </div>
       </div>
+      </main>
     </div>
   );
 }

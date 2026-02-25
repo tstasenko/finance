@@ -41,12 +41,16 @@ a{ color: inherit; }
   justify-content: space-between;
   gap: 16px;
   padding: 18px 22px;
-  margin-bottom: 20px;
+  margin-bottom: 32px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(11,18,32,0.98), rgba(11,18,32,0.95));
   border-radius: 20px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
+}
+
+.main-content {
+  padding-top: 8px;
 }
 
 .brand{
