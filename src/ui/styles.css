@@ -65,8 +65,23 @@ a{ color: inherit; }
 .backup-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
+
+.btnIcon {
+  padding: 8px 10px;
+  min-width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.btnIcon:hover { background: rgba(255,255,255,0.10); }
+.btnIcon svg { width: 18px; height: 18px; fill: currentColor; }
 
 .btn{
   border: 1px solid var(--border);

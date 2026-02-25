@@ -41,24 +41,13 @@ export function Backup({ state, onReplace }: Props) {
 
   return (
     <div className="backup-wrap">
-      <button type="button" className="btn" onClick={handleDownload} title="Скачать резервную копию">
-        Скачать копию
+      <button type="button" className="btnIcon" onClick={handleDownload} title="Скачать резервную копию">
+        <svg viewBox="0 0 24 24" aria-hidden><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-7 10v-2h2v2h-2z"/></svg>
       </button>
-      <button
-        type="button"
-        className="btn"
-        onClick={() => inputRef.current?.click()}
-        title="Восстановить из файла"
-      >
-        Восстановить
+      <button type="button" className="btnIcon" onClick={() => inputRef.current?.click()} title="Восстановить из файла">
+        <svg viewBox="0 0 24 24" aria-hidden><path d="M9 16h6v-6h4l-7-8-7 8h4v6z"/></svg>
       </button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".json,application/json"
-        style={{ display: "none" }}
-        onChange={handleFile}
-      />
+      <input ref={inputRef} type="file" accept=".json,application/json" style={{ display: "none" }} onChange={handleFile} />
     </div>
   );
 }

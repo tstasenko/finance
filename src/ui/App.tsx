@@ -70,6 +70,13 @@ export function App() {
   const [savingsTxnAmount, setSavingsTxnAmount] = useState("");
   const [savingsTxnComment, setSavingsTxnComment] = useState("");
 
+  useEffect(() => {
+    const ids = state.savings.categories.map((c) => c.id);
+    if (ids.length && (!savingsTxnCategoryId || !ids.includes(savingsTxnCategoryId))) {
+      setSavingsTxnCategoryId(ids[0]);
+    }
+  }, [state.savings.categories, savingsTxnCategoryId]);
+
   const monthTitle = formatMonthTitle(monthKey);
 
   if (!authReady) {
@@ -131,12 +138,12 @@ export function App() {
           </button>
           <Backup state={state} onReplace={(next) => dispatch({ type: "state/replace", next })} />
           <button
-            className="btn"
-            onClick={() => {
-              void supabase.auth.signOut();
-            }}
+            type="button"
+            className="btnIcon"
+            onClick={() => void supabase.auth.signOut()}
+            title="Выйти"
           >
-            Выйти
+            <svg viewBox="0 0 24 24" aria-hidden><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
           </button>
         </div>
       </div>
@@ -338,7 +345,6 @@ export function App() {
               <div className="listItem" key={c.id}>
                 <div>
                   <strong>{c.name}</strong> <span className="pill">Баланс: {formatMoney(c.balance)}</span>
-                  <div className="meta">Накопления общие для всех месяцев</div>
                 </div>
                 <button className="btn btnDanger" onClick={() => dispatch({ type: "savingsCategory/delete", id: c.id })}>
                   Удалить
@@ -467,57 +473,77 @@ export function App() {
           <SectionTitle title="История операций (месяц)" hint="Доходы / расходы / накопления" />
 
           <div className="list">
-            {m.incomes.map((x) => (
-              <div className="listItem" key={`i:${x.id}`}>
-                <div>
-                  <strong className="pos">+ {formatMoney(x.amount)}</strong>
-                  <div className="meta">{x.date}{x.comment ? ` • ${x.comment}` : ""}</div>
-                </div>
-                <span className="pill">Доход</span>
-              </div>
-            ))}
-
-            {m.expenses.map((x) => {
-              const cat = m.categories.find((c) => c.id === x.categoryId);
-              return (
-                <div className="listItem" key={`e:${x.id}`}>
-                  <div>
-                    <strong className="neg">- {formatMoney(x.amount)}</strong>
-                    <div className="meta">
-                      {x.date} • {cat?.name ?? "Категория удалена"}
-                      {x.comment ? ` • ${x.comment}` : ""}
-                    </div>
-                  </div>
-                  <span className="pill">Расход</span>
-                </div>
-              );
-            })}
-
-            {state.savings.transactions
-              .filter((t) => t.monthKey === monthKey)
-              .map((t) => {
-                const cat = state.savings.categories.find((c) => c.id === t.savingsCategoryId);
-                const isDep = t.type === "deposit";
-                return (
-                  <div className="listItem" key={`s:${t.id}`}>
-                    <div>
-                      <strong className={isDep ? "neg" : "pos"}>
-                        {isDep ? "- " : "+ "}
-                        {formatMoney(t.amount)}
-                      </strong>
-                      <div className="meta">
-                        {t.date} • Накопления: {cat?.name ?? "Категория удалена"}
-                        {t.comment ? ` • ${t.comment}` : ""}
+            {(() => {
+              const items: { date: string; createdAt: number; key: string; el: React.ReactNode }[] = [];
+              m.incomes.forEach((x) =>
+                items.push({
+                  date: x.date,
+                  createdAt: x.createdAt,
+                  key: `i:${x.id}`,
+                  el: (
+                    <div className="listItem" key={`i:${x.id}`}>
+                      <div>
+                        <strong className="pos">+ {formatMoney(x.amount)}</strong>
+                        <div className="meta">{x.date}{x.comment ? ` • ${x.comment}` : ""}</div>
                       </div>
+                      <span className="pill">Доход</span>
                     </div>
-                    <span className="pill">{isDep ? "В накопления" : "Из накоплений"}</span>
-                  </div>
-                );
-              })}
-
-            {!m.incomes.length && !m.expenses.length && !state.savings.transactions.some((t) => t.monthKey === monthKey) ? (
-              <div className="hint">Пока нет операций за этот месяц.</div>
-            ) : null}
+                  ),
+                })
+              );
+              m.expenses.forEach((x) => {
+                const cat = m.categories.find((c) => c.id === x.categoryId);
+                items.push({
+                  date: x.date,
+                  createdAt: x.createdAt,
+                  key: `e:${x.id}`,
+                  el: (
+                    <div className="listItem" key={`e:${x.id}`}>
+                      <div>
+                        <strong className="neg">- {formatMoney(x.amount)}</strong>
+                        <div className="meta">
+                          {x.date} • {cat?.name ?? "Категория удалена"}
+                          {x.comment ? ` • ${x.comment}` : ""}
+                        </div>
+                      </div>
+                      <span className="pill">Расход</span>
+                    </div>
+                  ),
+                });
+              });
+              state.savings.transactions
+                .filter((t) => t.monthKey === monthKey)
+                .forEach((t) => {
+                  const cat = state.savings.categories.find((c) => c.id === t.savingsCategoryId);
+                  const isDep = t.type === "deposit";
+                  items.push({
+                    date: t.date,
+                    createdAt: t.createdAt,
+                    key: `s:${t.id}`,
+                    el: (
+                      <div className="listItem" key={`s:${t.id}`}>
+                        <div>
+                          <strong className={isDep ? "neg" : "pos"}>
+                            {isDep ? "- " : "+ "}
+                            {formatMoney(t.amount)}
+                          </strong>
+                          <div className="meta">
+                            {t.date} • Накопления: {cat?.name ?? "Категория удалена"}
+                            {t.comment ? ` • ${t.comment}` : ""}
+                          </div>
+                        </div>
+                        <span className="pill">{isDep ? "В накопления" : "Из накоплений"}</span>
+                      </div>
+                    ),
+                  });
+                });
+              items.sort((a, b) => {
+                if (a.date !== b.date) return b.date.localeCompare(a.date);
+                return b.createdAt - a.createdAt;
+              });
+              if (!items.length) return <div className="hint">Пока нет операций за этот месяц.</div>;
+              return items.map((item) => <div key={item.key}>{item.el}</div>);
+            })()}
           </div>
         </div>
       </div>

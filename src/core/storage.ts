@@ -1,5 +1,5 @@
-import type { AppState, MonthKey, MonthlyState } from "./types";
-import { monthKeyFromDate } from "./date";
+import type { AppState, Category, MonthKey, MonthlyState } from "./types";
+import { monthKeyFromDate, shiftMonth } from "./date";
 
 const STORAGE_KEY = "expense-tracker:v1";
 
@@ -17,13 +17,32 @@ function emptyMonth(monthKey: MonthKey): MonthlyState {
   };
 }
 
+function copyCategoriesWithNewIds(categories: Category[]): Category[] {
+  return categories.map((c) => ({
+    ...c,
+    id: newId(),
+    createdAt: Date.now(),
+  }));
+}
+
 export function ensureMonth(state: AppState, monthKey: MonthKey): AppState {
   if (state.months[monthKey]) return state;
+  const prevKey = shiftMonth(monthKey, -1);
+  const prev = state.months[prevKey];
+  const newMonth: MonthlyState = prev
+    ? {
+        monthKey,
+        budgetPlan: prev.budgetPlan,
+        categories: copyCategoriesWithNewIds(prev.categories),
+        incomes: [],
+        expenses: [],
+      }
+    : emptyMonth(monthKey);
   return {
     ...state,
     months: {
       ...state.months,
-      [monthKey]: emptyMonth(monthKey),
+      [monthKey]: newMonth,
     },
   };
 }
