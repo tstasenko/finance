@@ -50,11 +50,21 @@ a{ color: inherit; }
 
 .brand{
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 14px;
 }
-.brand strong{ font-size: 1.05rem; letter-spacing: 0.2px; }
-.brand span{ font-size: 0.8rem; color: var(--muted); }
+.brandIcon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.brandIcon svg{ width: 22px; height: 22px; }
 
 .monthNav{
   display: flex;
@@ -174,14 +184,14 @@ a{ color: inherit; }
 .row .row-btns{
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 18px;
   flex-shrink: 0;
   min-width: 0;
   justify-content: center;
   align-self: center;
 }
 .listItem .row-btns{
-  gap: 10px;
+  gap: 20px;
 }
 .listItem .row-btns .btn{
   min-width: 0;

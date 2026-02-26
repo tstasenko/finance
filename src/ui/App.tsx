@@ -106,8 +106,13 @@ export function App() {
     <div className="container">
       <div className="topbar">
         <div className="brand">
-          <strong>Трекер личных финансов</strong>
-          <span>Данные хранятся в Supabase под вашим аккаунтом</span>
+          <span className="brandIcon" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 15h.01"/><path d="M12 15h3"/></svg>
+          </span>
+          <div className="kpiItem kpiItemTop">
+            <div className="label">Всего денег</div>
+            <div className={`value ${balanceWithSavings < 0 ? "neg" : ""}`}>{formatMoney(balanceWithSavings)}</div>
+          </div>
         </div>
         <div className="monthNav">
           <button
@@ -123,10 +128,6 @@ export function App() {
           <div style={{ minWidth: 220, textAlign: "center" }}>
             <div style={{ fontSize: 13, color: "var(--muted)" }}>Месяц</div>
             <div style={{ fontSize: 16 }}>{monthTitle}</div>
-          </div>
-          <div className="kpiItem kpiItemTop">
-            <div className="label">Всего денег</div>
-            <div className={`value ${balanceWithSavings < 0 ? "neg" : ""}`}>{formatMoney(balanceWithSavings)}</div>
           </div>
           <button
             className="btn"
