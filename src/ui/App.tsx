@@ -56,6 +56,14 @@ export function App() {
   const balance = useMemo(() => monthBalance(state, monthKey), [state, monthKey]);
   const savingsTotal = useMemo(() => totalSavingsBalance(state), [state]);
   const balanceWithSavings = useMemo(() => balance + savingsTotal, [balance, savingsTotal]);
+  const categoriesPlannedTotal = useMemo(
+    () => m.categories.reduce((s, c) => s + c.planned, 0),
+    [m.categories]
+  );
+  const budgetMinusPlanned = useMemo(
+    () => m.budgetPlan - categoriesPlannedTotal,
+    [m.budgetPlan, categoriesPlannedTotal]
+  );
 
   const [budgetInput, setBudgetInput] = useState(String(m.budgetPlan || ""));
   const [incomeAmount, setIncomeAmount] = useState("");
@@ -194,8 +202,16 @@ export function App() {
                 <div className="value">{formatMoney(expenseTotal)}</div>
               </div>
               <div className="kpiItem">
-                <div className="label">Прогноз</div>
+                <div className="label">Прогноз на месяц</div>
                 <div className="value">{formatMoney(m.budgetPlan)}</div>
+              </div>
+              <div className="kpiItem">
+                <div className="label">Прогноз по категориям</div>
+                <div className="value">{formatMoney(categoriesPlannedTotal)}</div>
+              </div>
+              <div className="kpiItem">
+                <div className="label">Прогноз на месяц − план по категориям</div>
+                <div className={`value ${budgetMinusPlanned < 0 ? "neg" : ""}`}>{formatMoney(budgetMinusPlanned)}</div>
               </div>
               <div className="kpiItem">
                 <div className="label">Остаток без накоплений</div>
