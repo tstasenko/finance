@@ -87,6 +87,16 @@ export function App() {
   const [savingsTxnComment, setSavingsTxnComment] = useState("");
 
   useEffect(() => {
+    const ids = m.categories.map((c) => c.id);
+    if (ids.length && (!expCategoryId || !ids.includes(expCategoryId))) {
+      setExpCategoryId(ids[0]);
+    }
+    if (!ids.length && expCategoryId) {
+      setExpCategoryId("");
+    }
+  }, [m.categories, expCategoryId]);
+
+  useEffect(() => {
     const ids = state.savings.categories.map((c) => c.id);
     if (ids.length && (!savingsTxnCategoryId || !ids.includes(savingsTxnCategoryId))) {
       setSavingsTxnCategoryId(ids[0]);
