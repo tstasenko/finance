@@ -60,9 +60,9 @@ export function App() {
     () => m.categories.reduce((s, c) => s + c.planned, 0),
     [m.categories]
   );
-  const balanceMinusPlanned = useMemo(
-    () => balance - categoriesPlannedTotal,
-    [balance, categoriesPlannedTotal]
+  const budgetMinusPlanned = useMemo(
+    () => m.budgetPlan - categoriesPlannedTotal,
+    [m.budgetPlan, categoriesPlannedTotal]
   );
 
   const [budgetInput, setBudgetInput] = useState(String(m.budgetPlan || ""));
@@ -220,8 +220,8 @@ export function App() {
                 <div className="value">{formatMoney(categoriesPlannedTotal)}</div>
               </div>
               <div className="kpiItem">
-                <div className="label">Остаток без накоплений − план по категориям</div>
-                <div className={`value ${balanceMinusPlanned < 0 ? "neg" : ""}`}>{formatMoney(balanceMinusPlanned)}</div>
+                <div className="label">Прогноз на месяц − план по категориям</div>
+                <div className={`value ${budgetMinusPlanned < 0 ? "neg" : ""}`}>{formatMoney(budgetMinusPlanned)}</div>
               </div>
               <div className="kpiItem">
                 <div className="label">Остаток без накоплений</div>
